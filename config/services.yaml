@@ -7,8 +7,33 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    locale: 'fr'
+    private_media_directory: '%kernel.project_dir%/public/uploads/default'
+    media_documents_directory: '%kernel.project_dir%/public/uploads/documents'
+    media_profile_images_directory: '%kernel.project_dir%/public/uploads/images'
+    media_establishments_images_directory: '%kernel.project_dir%/public/uploads/images'
+    media_publicities_images_directory: '%kernel.project_dir%/public/uploads/images'
+    expo_push_url: '%env(string:EXPO_PUSH_URL)%'
+    expo_access_token: '%env(string:EXPO_ACCESS_TOKEN)%'
 
 services:
+    acme_api.event.authentication_failure_listener:
+        class: App\EventSubscriber\AuthenticationEventSubscriber
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+
+    acme_api.event.jwt_token_expired_listener:
+        class: App\EventSubscriber\JWTEventSubscriber
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_expired, method: onJWTExpired}
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_invalid, method: onJWTInvalid}
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_not_found, method: onJWTNotFound}
+
+    kernel.controller.event_listener:
+        class: App\EventSubscriber\ExceptionSubscriber
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onControllerEvent}
+    
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
@@ -18,6 +43,11 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    App\Services\PushNotificationService:
+        arguments:
+            $expoPushUrl: '%expo_push_url%'
+            $expoAccessToken: '%expo_access_token%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
