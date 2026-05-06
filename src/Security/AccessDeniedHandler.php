@@ -18,6 +18,6 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
             "status" => 0,
             "message" => $accessDeniedException->getMessage() != '' ? $accessDeniedException->getMessage() : "Accès refusé !"
         ];
-        return new JsonResponse($data, 403);
+        return new JsonResponse($data, 401);
     }
 }

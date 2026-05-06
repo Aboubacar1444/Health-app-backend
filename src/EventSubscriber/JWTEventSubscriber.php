@@ -28,6 +28,9 @@ final class JWTEventSubscriber implements EventSubscriberInterface
     {
         $response = $this->responseHelper->errorResponse(
             "Votre session a expiré, veuillez vous reconnecter.",
+            0,
+            [],
+            401
         );
 
         $event->setResponse($response);
@@ -36,6 +39,9 @@ final class JWTEventSubscriber implements EventSubscriberInterface
     {
         $response = $this->responseHelper->errorResponse(
             "Votre session est invalide, veuillez vous reconnecter.",
+            0,
+            [],
+            401
         );
 
         $event->setResponse($response);
@@ -45,6 +51,9 @@ final class JWTEventSubscriber implements EventSubscriberInterface
     {
         $response = $this->responseHelper->errorResponse(
             "Jeton (Token de session) JWT introuvable, veuillez vous authentifié.",
+            0,
+            [],
+            401
         );
 
         $event->setResponse($response);

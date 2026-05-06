@@ -79,6 +79,10 @@ class Appointment
     #[Groups(['appointment'])]
     private ?string $patientSymptoms = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Groups(['appointment'])]
+    private ?array $insurance = null;
+
     #[ORM\Column(length: 20)]
     #[Groups(['appointment'])]
     private ?string $priority = 'NORMAL';
@@ -282,6 +286,17 @@ class Appointment
     public function setPatientSymptoms(?string $patientSymptoms): static
     {
         $this->patientSymptoms = $patientSymptoms;
+        return $this;
+    }
+
+    public function getInsurance(): ?array
+    {
+        return $this->insurance;
+    }
+
+    public function setInsurance(?array $insurance): static
+    {
+        $this->insurance = $insurance;
         return $this;
     }
 

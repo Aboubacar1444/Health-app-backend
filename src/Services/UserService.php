@@ -1,8 +1,11 @@
 <?php
 namespace App\Services;
 use App\Entity\User;
+use App\Entity\Notification;
 use App\Repository\UserRepository;
 use App\Utils\Roles;
+use App\Utils\NotificationPriority;
+use App\Utils\NotificationType;
 use App\Request\UserSearchRequest;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -114,8 +117,12 @@ final class UserService
             return $this->responsesService->errorResponse("Utilisateur introuvable");
         }
 
+        $wasActivated = (bool) $user->isActivated();
         $user->setIsActivated(true);
         $user = $this->entityHelper->update($user);
+        if (!$wasActivated) {
+            $this->createDoctorAccountActivationNotification($user);
+        }
         $body = json_decode($this->serializer->serialize($user, 'json', ["groups" => "user"]), true);
         return $this->responsesService->successResponse($body, "Utilisateur activé");
     }
@@ -262,7 +269,25 @@ final class UserService
             return $this->responsesService->errorResponse("Erreur lors de l'upload de l'image: " . $e->getMessage());
         }
     }
-        
-    
+
+    private function createDoctorAccountActivationNotification(User $user): void
+    {
+        if ($user->getUserJob() !== 'MEDECIN') {
+            return;
+        }
+
+        $notification = new Notification();
+        $notification->setUserId($user->getId())
+            ->setType(NotificationType::SYSTEM)
+            ->setTitle('Compte activé')
+            ->setMessage('Votre compte médecin a été activé. Vous pouvez maintenant accéder à votre espace.')
+            ->setData([
+                'userId' => $user->getId()?->toRfc4122(),
+            ])
+            ->setPriority(NotificationPriority::NORMAL)
+            ->setIsRead(false);
+
+        $this->entityHelper->save($notification);
+    }
 
 }

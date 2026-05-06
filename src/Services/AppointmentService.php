@@ -330,10 +330,10 @@ final class AppointmentService
         }
 
 
-        if ($doctor && $doctor->getUserId()) {
-            $this->createNotification($doctor->getUserId(), $titleDoctor, $messageDoctor, $payload, $priority);
+        $doctorUserId =  $doctorUser?->getId();
+        if ($doctorUserId) {
+            $this->createNotification($doctorUserId, $titleDoctor, $messageDoctor, $payload, $priority);
         }
-        sleep(2); // Petite pause pour éviter les conflits de notifications simultanées
 
         if ($appointment->getPatientId()) {
             $this->createNotification($appointment->getPatientId(), $titlePatient, $messagePatient, $payload, $priority);

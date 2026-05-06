@@ -26,12 +26,19 @@ final class DoctorEstablishmentController extends AbstractController
         return $this->doctorEstablishmentService->getDoctorEstablishments($doctorId);
     }
 
+    // #[Route('/update-doctor-establishments/{doctorId}', name: 'app_doctor_establishment_by_doctor', methods: "PUT")]
+    // public function updateDoctorEstablishmentsByDoctorId(string $doctorId, Request $request): JsonResponse
+    // {
+    //     $data = json_decode($request->getContent(), true);
+    //     return $this->doctorEstablishmentService->updateDoctorEstablishmentByDoctorId($doctorId, $data);
+    // }
+
 
     #[Route('/{id}', name: 'app_doctor_establishment_update', methods: "PUT")]
     public function updateDoctorEstablishment(string $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        return $this->doctorEstablishmentService->updateDoctorEstablishment($id, $data);
+        return $this->doctorEstablishmentService->updateDoctorEstablishmentByDoctorId($id, $data);
     }
 
     #[Route('/{id}', name: 'app_doctor_establishment_delete', methods: "DELETE")]

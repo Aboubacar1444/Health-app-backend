@@ -9,6 +9,7 @@ use App\Utils\Roles;
 use App\Utils\RevieweeType;
 use App\Utils\HealthTipCategory;
 use App\Utils\DataType;
+use App\Repository\InsuranceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,7 +17,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/metadata')]
 final class MetadataController extends AbstractController
 {
-    public function __construct(private readonly ResponsesService $responsesService) {}
+    public function __construct(
+        private readonly ResponsesService $responsesService,
+        private readonly InsuranceRepository $insuranceRepository,
+    ) {}
 
     #[Route('/establishment-types', name: 'app_metadata_establishment_types', methods: "GET")]
     public function getEstablishmentTypes(): JsonResponse
@@ -90,6 +94,26 @@ final class MetadataController extends AbstractController
         return $this->responsesService->successResponse($jobs, "Types d'emploi");
     }
 
+    #[Route('/insurances', name: 'app_metadata_insurances', methods: "GET")]
+    public function getInsurances(): JsonResponse
+    {
+        $insurances = $this->insuranceRepository->findBy(
+            ['isActive' => true],
+            ['name' => 'ASC']
+        );
+
+        $data = array_map(
+            fn($insurance) => [
+                'id' => (string) $insurance->getId(),
+                'name' => $insurance->getName(),
+                'taux' => $insurance->getTaux(),
+            ],
+            $insurances
+        );
+
+        return $this->responsesService->successResponse($data, "Assurances");
+    }
+
     #[Route('/all', name: 'app_metadata_all', methods: "GET")]
     public function getAllMetadata(): JsonResponse
     {
@@ -125,7 +149,15 @@ final class MetadataController extends AbstractController
             'dataTypes' => array_map(fn($case) => [
                 'value' => $case->value,
                 'label' => $this->getDataTypeLabel($case)
-            ], DataType::cases())
+            ], DataType::cases()),
+            'insurances' => array_map(
+                fn($insurance) => [
+                    'id' => (string) $insurance->getId(),
+                    'name' => $insurance->getName(),
+                    'taux' => $insurance->getTaux(),
+                ],
+                $this->insuranceRepository->findBy(['isActive' => true], ['name' => 'ASC'])
+            ),
         ];
 
         return $this->responsesService->successResponse($metadata, "Toutes les métadonnées");

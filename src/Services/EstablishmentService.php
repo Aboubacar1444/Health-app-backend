@@ -26,6 +26,12 @@ final class EstablishmentService
         if ((!$data || empty($data)) && !$file) {
             return $this->responsesService->errorResponse("Données invalides");
         }
+        if (array_key_exists('insurances', $data)) {
+            $error = $this->validateInsurances($data['insurances']);
+            if ($error) {
+                return $this->responsesService->errorResponse($error);
+            }
+        }
         if ($file) {
             try {
                 $fileName = $this->uploadFileService->uploadFile($file, 'EstablishmentImages');
@@ -128,6 +134,12 @@ final class EstablishmentService
         if (!$establishment) {
             return $this->responsesService->errorResponse("Établissement introuvable");
         }
+        if (array_key_exists('insurances', $data)) {
+            $error = $this->validateInsurances($data['insurances']);
+            if ($error) {
+                return $this->responsesService->errorResponse($error);
+            }
+        }
         if ($file) {
             try {
                 $fileName = $this->uploadFileService->uploadFile($file, 'EstablishmentImages');
@@ -147,6 +159,40 @@ final class EstablishmentService
         $establishment = $this->entityHelper->update($establishment);
         $body = json_decode($this->serializer->serialize($establishment, 'json', ["groups" => "establishment"]), true);
         return $this->responsesService->successResponse($body, "Établissement mis à jour");
+    }
+
+    private function validateInsurances(mixed $insurances): ?string
+    {
+        if ($insurances === null) {
+            return null;
+        }
+
+        if (!is_array($insurances)) {
+            return "Le champ insurances doit être un tableau d'objets";
+        }
+
+        foreach ($insurances as $index => $insurance) {
+            if (!is_array($insurance)) {
+                return "Chaque assurance doit être un objet (index $index)";
+            }
+
+            $name = $insurance['name'] ?? null;
+            $taux = $insurance['taux'] ?? null;
+
+            if (!is_string($name) || trim($name) === '') {
+                return "Le champ name est obligatoire pour chaque assurance (index $index)";
+            }
+
+            if ($taux === null || $taux === '') {
+                return "Le champ taux est obligatoire pour chaque assurance (index $index)";
+            }
+
+            if (!is_numeric($taux)) {
+                return "Le champ taux doit être numérique (index $index)";
+            }
+        }
+
+        return null;
     }
 
     public function removeEstablishment(string $id): JsonResponse
