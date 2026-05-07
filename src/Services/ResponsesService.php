@@ -3,7 +3,7 @@ namespace App\Services;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class ResponsesService {
-    public function successResponse(array $data = [], string $message = "Successfully requested", int $status = 1): JsonResponse
+    public function successResponse(?array $data = [], string $message = "Successfully requested", int $status = 1): JsonResponse
     {
         return new JsonResponse([
             'status' => $status,
