@@ -148,15 +148,25 @@ final class EstablishmentService
                 return $this->responsesService->errorResponse($e->getMessage());
             }
         }
-        foreach ($data as $key => $value) {
-            $setter = 'set' . ucfirst($key);
-            if ($key === 'type') {
-                $value = EstablishmentType::tryFrom($value)?->value ?? null;
-            }
-            if (method_exists($establishment, $setter)) {
-                $establishment->$setter($value);
-            }
-        }
+        $data['type'] = EstablishmentType::tryFrom($data['type']) ? EstablishmentType::tryFrom($data['type']) : null;
+        $data = json_encode($data);
+        
+        $establishment = $this->serializer->deserialize($data, Establishment::class, 'json', ['object_to_populate' => $establishment]);
+        // foreach ($data as $key => $value) {
+        //     $setter = 'set' . ucfirst($key);
+        //     if ($key === 'type') {
+        //         $value = EstablishmentType::tryFrom($value)?->value ?? null;
+        //     }
+        //     if ($key === "insurances") {
+        //         $value = json_encode($value);
+        //     }
+        //     if (method_exists($establishment, $setter)) {
+        //         if ($setter === 'setType' && is_string($value)) {
+        //             $value = EstablishmentType::tryFrom($value)?->value ?? null;
+        //         }
+        //         $establishment->$setter($value);
+        //     }
+        // }
 
 
         $establishment = $this->entityHelper->update($establishment);
