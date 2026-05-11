@@ -150,6 +150,9 @@ final class EstablishmentService
         }
         foreach ($data as $key => $value) {
             $setter = 'set' . ucfirst($key);
+            if ($key === 'type') {
+                $value = EstablishmentType::tryFrom($value)?->value ?? null;
+            }
             if (method_exists($establishment, $setter)) {
                 $establishment->$setter($value);
             }
@@ -175,10 +178,13 @@ final class EstablishmentService
             if (!is_array($insurance)) {
                 return "Chaque assurance doit être un objet (index $index)";
             }
-
+            $id = $insurance['id'] ?? null;
             $name = $insurance['name'] ?? null;
             $taux = $insurance['taux'] ?? null;
 
+            if ($id === null || $id === '') {
+                return "Le champ id est obligatoire pour chaque assurance (index $index)";
+            }
             if (!is_string($name) || trim($name) === '') {
                 return "Le champ name est obligatoire pour chaque assurance (index $index)";
             }
