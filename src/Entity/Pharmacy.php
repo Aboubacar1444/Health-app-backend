@@ -36,6 +36,10 @@ class Pharmacy
     #[Groups(['pharmacy'])]
     private ?string $postalCode = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['pharmacy'])]
+    private ?string $image = null;
+
     #[ORM\Column(length: 20, nullable: true)]
     #[Groups(['pharmacy'])]
     private ?string $phone = null;
@@ -284,6 +288,17 @@ class Pharmacy
     public function setUpdatedAt(): static
     {
         $this->updatedAt = new DateTimeImmutable();
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
         return $this;
     }
 }

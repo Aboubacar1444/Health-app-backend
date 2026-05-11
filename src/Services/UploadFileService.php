@@ -18,7 +18,7 @@ class UploadFileService
     public function uploadFile(File $file, $mediaType = "default"): string
     {
         // Vérifie si le type de fichier est valide
-        $allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'application/pdf', 'application/msword', 'application/csv',];
+        $allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/heic', 'image/heif', 'image/webp', 'application/pdf', 'application/msword', 'application/csv',];
 
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
             throw new BadRequestHttpException('Type de fichier non autorisé.');
@@ -26,7 +26,7 @@ class UploadFileService
 
         // Validation spécifique pour les images de profil
         if (in_array($mediaType, ['UserImages', 'EstablishmentImages'])) {
-            $imageMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+            $imageMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/heic', 'image/heif', 'image/webp'];
             if (!in_array($file->getMimeType(), $imageMimeTypes)) {
                 throw new BadRequestHttpException('Seules les images sont autorisées pour ce type de média.');
             }

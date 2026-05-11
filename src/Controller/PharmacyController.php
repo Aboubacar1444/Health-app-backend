@@ -22,7 +22,12 @@ class PharmacyController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        return $this->pharmacyService->addPharmacy($data);
+        if(!$data) {
+            $file = $request->files->get('file');
+            $data = $request->request->get('data');
+        }
+
+        return $this->pharmacyService->addPharmacy($data, $file ?? null);
     }
 
     #[Route('/search', name: 'app_pharmacy_search', methods: ['POST'])]

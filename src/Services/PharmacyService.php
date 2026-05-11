@@ -8,6 +8,7 @@ use App\Repository\CommuneRepository;
 use App\Repository\PharmacyDutyScheduleRepository;
 use Symfony\Component\Uid\Uuid;
 use App\Request\PharmacySearchRequest;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -20,15 +21,24 @@ final class PharmacyService
         private readonly ResponsesService $responsesService,
         private readonly SerializerInterface $serializer,
         private readonly EntityHelperService $entityHelper,
+        private readonly UploadFileService $uploadFileService,
         private readonly PaginationService $paginationService,
     ) {}
 
-    public function addPharmacy(array $data): JsonResponse
+    public function addPharmacy(?array $data, ?File $file): JsonResponse
     {
         if (!$data || empty($data)) {
             return $this->responsesService->errorResponse("Données invalides");
         }
         $data['communeId'] = $data['communeId'] ? Uuid::fromString($data['communeId']) : null;
+        if ($file) {
+            try {
+                $fileName = $this->uploadFileService->uploadFile($file, 'EstablishmentImages');
+                $data['image'] = $fileName;
+            } catch (\Exception $e) {
+                return $this->responsesService->errorResponse("Erreur lors de l'upload de l'image: " . $e->getMessage());
+            }
+        }
         $pharmacy = $this->serializer->deserialize(json_encode($data), Pharmacy::class, 'json');
         $pharmacy = $this->entityHelper->save($pharmacy);
 
