@@ -80,7 +80,7 @@ class Insurance
 
     public function setTaux(?float $taux): static
     {
-        $this->taux = $taux;
+        $this->taux = (float)$taux;
         return $this;
     }
 

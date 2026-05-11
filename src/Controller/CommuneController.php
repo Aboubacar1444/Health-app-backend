@@ -29,6 +29,13 @@ class CommuneController extends AbstractController
         $limit = (int) $request->query->get('limit', 10);
         return $this->communeService->getAllCommunes($page, $limit);
     }
+    #[Route('/{id}', name: 'app_commune_edit', methods: ['PUT'])]
+    public function updateCommune(string $id, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        return $this->communeService->updateCommune($id, $data);
+    }
+    
 
     #[Route('/{id}', name: 'app_commune_show', methods: ['GET'])]
     public function show(string $id): JsonResponse

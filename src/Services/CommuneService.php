@@ -68,4 +68,18 @@ final class CommuneService
             ->setParameter('active', true);
         return $this->paginationService->paginate($queryBuilder, $page, $limit, ["pharmacy"]);
     }
+
+    public function updateCommune(string $id, ?array $data): JsonResponse
+    {
+        $commune = $this->communeRepository->find($id);
+        if (!$commune) {
+            return $this->responsesService->errorResponse("Commune introuvable");
+        }
+
+        $updatedCommune = $this->serializer->deserialize(json_encode($data), Commune::class, 'json', ['object_to_populate' => $commune]);
+        $updatedCommune = $this->entityHelper->save($updatedCommune);
+
+        $body = json_decode($this->serializer->serialize($updatedCommune, 'json', ["groups" => "commune"]), true);
+        return $this->responsesService->successResponse($body, "Commune mise à jour avec succès");
+    }
 }

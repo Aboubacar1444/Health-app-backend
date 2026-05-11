@@ -24,6 +24,7 @@ final class PharmacyDutyScheduleService
 
     public function createDutySchedule(string $pharmacyId, array $data): JsonResponse
     {
+        dd($pharmacyId);
         $pharmacy = $this->pharmacyRepository->find($pharmacyId);
         if (!$pharmacy) {
             return $this->responsesService->errorResponse("Pharmacie introuvable");

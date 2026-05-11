@@ -21,13 +21,16 @@ class PharmacyController extends AbstractController
     #[Route('', name: 'app_pharmacy_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        if(!$data) {
+        
+        if($request->files->get('file')) {
             $file = $request->files->get('file');
             $data = $request->request->get('data');
+        }else {
+            $file = null;
+            $data = json_decode($request->getContent(), true);
         }
 
-        return $this->pharmacyService->addPharmacy($data, $file ?? null);
+        return $this->pharmacyService->addPharmacy($data, $file);
     }
 
     #[Route('/search', name: 'app_pharmacy_search', methods: ['POST'])]
@@ -93,6 +96,7 @@ class PharmacyController extends AbstractController
     #[Route('/{id}/duty-schedule', name: 'app_pharmacy_create_duty_schedule', methods: ['POST'])]
     public function createDutySchedule(string $id, Request $request): JsonResponse
     {
+        dd($id);
         $data = json_decode($request->getContent(), true);
         return $this->dutyScheduleService->createDutySchedule($id, $data);
     }
